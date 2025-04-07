@@ -18,7 +18,6 @@ func Init() {
 	user := beego.AppConfig.String("mysqlUser")
 	password := beego.AppConfig.String("mysqlPassword")
 	dbName := beego.AppConfig.String("mysqlDb")
-
 	//Data Source Name=DSN
 	connectInfo := []string{user, ":", password, "@tcp(", host, ":", port, ")/", dbName, "?charset=utf8"}
 	DSN := strings.Join(connectInfo, "")
