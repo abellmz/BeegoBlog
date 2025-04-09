@@ -4,6 +4,7 @@ import (
 	"BeegoBlog/AllSrcCode/models"
 	"BeegoBlog/AllSrcCode/util"
 	"fmt"
+	"github.com/astaxie/beego/logs"
 	"io"
 	"os"
 	"path/filepath"
@@ -340,4 +341,13 @@ func (c *AdminController) Upload() {
 	}
 	c.Data["json"] = response
 	c.ServeJSON()
+}
+
+func (c *AdminController) RedisTest() {
+	val, err := util.TTL("mykey")
+	if err != nil {
+		logs.Error("Error getting cache:", err)
+		return
+	}
+	logs.Info(val)
 }

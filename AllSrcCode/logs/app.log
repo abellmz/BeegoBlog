@@ -1,0 +1,40 @@
+2025/04/07 16:24:40.116 [I] [main.go:35]  Application started
+2025/04/07 16:24:40.138 [I] [main.go:36]  Mysql connected successfully!
+2025/04/07 16:24:40.189 [I] [main.go:40]  Redis connected successfully!
+2025/04/07 16:24:40.212 [I] [main.go:41]  MongoDB connected successfully!
+2025/04/07 16:24:40.245 [I] [asm_amd64.s:1695]  http server Running on http://:8080
+2025/04/07 16:25:26.683 [I] [main.go:35]  Application started
+2025/04/07 16:25:26.702 [I] [main.go:36]  Mysql connected successfully!
+2025/04/07 16:25:26.744 [I] [main.go:40]  Redis connected successfully!
+2025/04/07 16:25:26.768 [I] [main.go:41]  MongoDB connected successfully!
+2025/04/07 16:25:26.799 [I] [asm_amd64.s:1695]  http server Running on http://:8080
+2025/04/07 16:25:34.846 [D] [server.go:3142]  |            ::1|[90;47m 302 [0m|    825.589µs|   match|[97;46m POST    [0m /admin/redistest   r:/admin/redistest/*
+2025/04/07 16:25:34.873 [D] [server.go:3142]  |            ::1|[97;42m 200 [0m|   2.132993ms|   match|[97;44m GET     [0m /admin/login   r:/admin/login/*
+2025/04/07 16:25:44.650 [D] [server.go:3142]  |            ::1|[90;47m 302 [0m|  11.063299ms|   match|[97;46m POST    [0m /admin/login   r:/admin/login/*
+2025/04/07 16:25:44.654 [D] [server.go:3142]  |            ::1|[97;42m 200 [0m|   1.523013ms|   match|[97;44m GET     [0m /admin/main.html   r:/admin/main/*
+2025/04/07 16:25:54.118 [I] [value.go:596]  -2ns
+2025/04/07 16:25:54.122 [C] [panic.go:770]  the request url is  /admin/redistest
+2025/04/07 16:25:54.122 [C] [panic.go:770]  Handler crashed with error can't find templatefile in the path:views/admincontroller/redistest.tpl
+2025/04/07 16:25:54.122 [C] [panic.go:770]  /usr/local/go/src/runtime/panic.go:770
+2025/04/07 16:25:54.122 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/template.go:75
+2025/04/07 16:25:54.122 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/controller.go:306
+2025/04/07 16:25:54.122 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/controller.go:257
+2025/04/07 16:25:54.123 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/controller.go:237
+2025/04/07 16:25:54.123 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/router.go:909
+2025/04/07 16:25:54.123 [C] [panic.go:770]  /usr/local/go/src/net/http/server.go:3142
+2025/04/07 16:25:54.123 [C] [panic.go:770]  /usr/local/go/src/net/http/server.go:2044
+2025/04/07 16:25:54.123 [C] [panic.go:770]  /usr/local/go/src/runtime/asm_amd64.s:1695
+2025/04/07 16:25:54.124 [server.go:3416]  [HTTP] http: superfluous response.WriteHeader call from github.com/astaxie/beego/context.(*Response).WriteHeader (context.go:230)
+2025/04/07 16:26:16.590 [I] [value.go:596]  -2ns
+2025/04/07 16:26:16.593 [C] [panic.go:770]  the request url is  /admin/redistest
+2025/04/07 16:26:16.593 [C] [panic.go:770]  Handler crashed with error can't find templatefile in the path:views/admincontroller/redistest.tpl
+2025/04/07 16:26:16.593 [C] [panic.go:770]  /usr/local/go/src/runtime/panic.go:770
+2025/04/07 16:26:16.593 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/template.go:75
+2025/04/07 16:26:16.593 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/controller.go:306
+2025/04/07 16:26:16.593 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/controller.go:257
+2025/04/07 16:26:16.593 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/controller.go:237
+2025/04/07 16:26:16.593 [C] [panic.go:770]  /Users/minzhangli/gopath/pkg/mod/github.com/astaxie/beego@v1.12.3/router.go:909
+2025/04/07 16:26:16.593 [C] [panic.go:770]  /usr/local/go/src/net/http/server.go:3142
+2025/04/07 16:26:16.593 [C] [panic.go:770]  /usr/local/go/src/net/http/server.go:2044
+2025/04/07 16:26:16.593 [C] [panic.go:770]  /usr/local/go/src/runtime/asm_amd64.s:1695
+2025/04/07 16:26:16.593 [server.go:3416]  [HTTP] http: superfluous response.WriteHeader call from github.com/astaxie/beego/context.(*Response).WriteHeader (context.go:230)

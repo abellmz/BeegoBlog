@@ -17,16 +17,20 @@ type baseController struct {
 }
 
 // 后台登录
-// 不允许在未登录的情况下访问我们的controller，所以需要判断是否已经登录
+// 不允许在未登录的情况下访问controller，所以需要判断是否已经登录
 func (p *baseController) Prepare() {
 	controllerName, actionName := p.GetControllerAndAction()
-	// 用strings.ToLower  转换小写提取0-5 之前的字母admin
+	//转换小写提取0-5 比如字母admin
 	p.controllerName = strings.ToLower(controllerName[0 : len(controllerName)-10])
-	//Login 转换为小写 login
+	//转换为小写 比如login
 	p.actionName = strings.ToLower(actionName)
 
 	//新建一个ORM，之前已经在initMode中注册了mysql
 	p.o = orm.NewOrm()
+	//若是api关闭自动渲染
+	if strings.ToLower(p.controllerName) == "api" {
+		p.EnableRender = false
+	}
 	//跳转条件：是admin，当前动作不是login，且用户未登录（在session中没有记录）
 	if strings.ToLower(p.controllerName) == "admin" && strings.ToLower(p.actionName) != "login" {
 		if p.GetSession("user") == nil {
