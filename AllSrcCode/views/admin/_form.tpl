@@ -32,7 +32,7 @@
             <select name="cate_id" lay-verify="required">
                 {{if .categorys}}
                         {{range .categorys}}
-                            <option value="{{.Id}}" {{if eq $.post.CategoryId .Id}} selected {{end}}>{{.Name}}</option>
+                            <option value="{{.Id}}" {{if and $.post.CategoryId (eq $.post.CategoryId .Id)}} selected {{end}}>{{.Name}}</option>
                         {{end}}
                     {{else}}
                         <option value=""></option>
