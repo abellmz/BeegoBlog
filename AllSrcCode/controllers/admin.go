@@ -407,7 +407,7 @@ func (c *AdminController) Index() {
 	c.Data["count"] = count
 	c.Data["list"] = list
 	c.Data["cate_id"] = cateId
-	path := fmt.Sprintf("/admin/chat.html?keyword=%s", keyword)
+	path := fmt.Sprintf("/admin/index.html?keyword=%s", keyword)
 	c.Data["pagebar"] = util.NewPager(page, int(count), pagesize, path, true).ToString()
 	c.TplName = c.controllerName + "/list.tpl"
 }
@@ -421,7 +421,7 @@ func (c *AdminController) Delete() {
 		if _, err := c.o.Delete(&models.Post{Id: id}); err != nil {
 			c.History("未能成功删除", "")
 		} else {
-			c.History("删除成功", "/admin/chat.html")
+			c.History("删除成功", "/admin/index.html")
 		}
 	}
 }
@@ -466,14 +466,14 @@ func (c *AdminController) Save() {
 		if _, err := c.o.Insert(&post); err != nil {
 			c.History("插入数据错误"+err.Error(), "")
 		} else {
-			c.History("插入数据成功", "/admin/chat.html")
+			c.History("插入数据成功", "/admin/index.html")
 		}
 	} else {
 		post.Id = id
 		if _, err := c.o.Update(&post); err != nil {
 			c.History("更新数据出错"+err.Error(), "")
 		} else {
-			c.History("插入数据成功", "/admin/chat.html")
+			c.History("插入数据成功", "/admin/index.html")
 		}
 	}
 }
