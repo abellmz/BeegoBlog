@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="/static/css/chat.css">
+</head>
+<body>
+<div class="container">
+    <div class="sidebar">
+        <h2>在线用户</h2>
+        <ul id="userList"></ul>
+    </div>
+    <div class="chat-area">
+        <div id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="输入消息...">
+            <select id="userSelect">
+                <option value="all">广播</option>
+            </select>
+            <button onclick="sendMessage()">发送</button>
+        </div>
+    </div>
+</div>
+<script>
+    let currentUser = "{{.userID}}";
+</script>
+<script src="/static/js/chat.js"></script>
+</body>
+</html>

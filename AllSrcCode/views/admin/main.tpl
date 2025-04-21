@@ -8,7 +8,7 @@
     <meta name="Description" content="">
     <title>后台管理系统</title>
     <link rel="stylesheet" href="/static/plug/layui/css/layui.css">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <!-- <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> -->
 </head>
 
 <body>
@@ -61,7 +61,7 @@
 
     <!-- 底部 -->
     <div class="layui-footer" style="text-align: center; line-height: 44px;">
-        Copyright ©无鞋
+        Copyright ©牧羊人
     </div>
 </div>
 
@@ -92,6 +92,8 @@
             { id: 3, pid: 2, node: '&nbsp;&nbsp;&nbsp;分类管理', url: '/admin/category.html' },
             { id: 5, pid: 2, node: '&nbsp;&nbsp;&nbsp;博文列表', url: '/admin/index.html' },
             { id: 6, pid: 2, node: '&nbsp;&nbsp;&nbsp;博文添加', url: '/admin/article.html' },
+            { id: 8, pid: 0, node: '<span style=" font-size: 16px"><i class="layui-icon">&#xe621;</i> 聊天室</span>', url: '#' },
+            { id: 9, pid: 8, node: '&nbsp;&nbsp;&nbsp;聊天室', url: '/admin/chat.html' },
         ], 0, 'id', 'pid', 'node', 'url');
         cms.bind(60 + 41 + 20 + 44); //头部高度 + 顶部切换卡标题高度 + 顶部切换卡内容padding + 底部高度
         cms.clickLI(1);

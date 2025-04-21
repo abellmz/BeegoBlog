@@ -5,7 +5,6 @@ import (
 	_ "BeegoBlog/AllSrcCode/routers"
 	"BeegoBlog/AllSrcCode/util"
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
 	//"time"
 )
 
@@ -34,9 +33,9 @@ func main() {
 	util.InitLogs() //初始化日志
 	models.Init()   // 初始化模型和数据库连接
 	//aliasName数据库别名,isDrop是否在创建表之前先删除现有的表,isForce是否强制创建表
-	orm.RunSyncdb("default", false, true) // 自动建表 有这个debug直接报错并停止运行
-	models.InitAdmin()                    //初始化管理员数据
-	util.InitRedis()                      //初始化redis
-	util.InitMongo()                      //初始化mongodb
+	//orm.RunSyncdb("default", false, true) // 自动建表 有这个debug直接报错并停止运行
+	//models.InitAdmin()                    //初始化管理员数据
+	util.InitRedis() //初始化redis
+	util.InitMongo() //初始化mongodb
 	beego.Run()
 }

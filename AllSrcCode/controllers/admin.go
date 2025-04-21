@@ -3,25 +3,201 @@ package controllers
 import (
 	"BeegoBlog/AllSrcCode/models"
 	"BeegoBlog/AllSrcCode/util"
+	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego/logs"
+	"github.com/gorilla/websocket"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
+	//"syscall"
 	"time"
 )
+
+var (
+	// 连接池
+	socketClients = make(map[*websocket.Conn]string, 10)
+	// 锁
+	//mu sync.Mutex
+	sendToUserMu       sync.Mutex
+	socketClientsMu1   sync.Mutex
+	socketClientsMu2   sync.Mutex
+	broadcastMessageMu sync.Mutex
+	//getUsersMu sync.Mutex
+	// 消息通道
+	messageChannel = make(chan Message, 20)
+)
+
+// WebSocket升级器
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true //直接返回 true 是为了允许所有来源的连接，但在实际项目里，最好还是加点限制，别让坏人钻了空子。如何防范呢？
+	},
+}
 
 type AdminController struct {
 	baseController
 }
 
+// 消息结构体
+type Message struct {
+	SenderID   string `json:"sender_id"`
+	ReceiverID string `json:"receiver_id"`
+	Text       string `json:"text"`
+}
+
+func init() {
+	// 启动消息处理协程
+	go handleMessages()
+}
+
+// WebSocketHandler 处理 WebSocket 连接
+func (c *AdminController) WebSocketHandler() {
+
+	//返回 升级器升级后的连接和错误
+	ws, err := upgrader.Upgrade(c.Ctx.ResponseWriter, c.Ctx.Request, nil)
+	if err != nil {
+		logs.Error("Upgrade error:", err)
+		return
+	}
+	defer ws.Close() //连接关闭
+
+	//获取用户ID，token解析
+	// 从 Cookie 中获取 token
+	token := c.Ctx.GetCookie("token")
+	if token == "" {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
+		logs.Error("Unauthorized:")
+		return
+	}
+	claims, err := util.ParseToken(token, "123456")
+	if err != nil {
+		logs.Error("Invalid token:", err, claims)
+		return
+	}
+
+	// 添加到连接池
+	socketClientsMu1.Lock()
+	//一个map 存储连接-userID
+	socketClients[ws] = claims.UserID
+	socketClientsMu1.Unlock()
+	// 连接中 发送欢迎消息
+	err = ws.WriteMessage(websocket.TextMessage, []byte("Welcome to the chat room!"))
+	if err != nil {
+		logs.Error("Write error:", err)
+		return
+	}
+	for {
+		_, msg, readMessageErr := ws.ReadMessage()
+		if readMessageErr != nil { //若在此处打断点，在websocket未关闭前，刷新聊天室，会导致socket.CloseError
+			logs.Error("Read error"+claims.UserID+":", readMessageErr)
+			break
+		}
+		var message Message
+		if unmarshalErr := json.Unmarshal(msg, &message); unmarshalErr != nil {
+			logs.Error("Unmarshal error:", unmarshalErr)
+			continue
+		}
+		message.SenderID = claims.UserID
+		messageChannel <- message
+	}
+	//移除池中连接-userid
+	socketClientsMu2.Lock()
+	delete(socketClients, ws)
+	socketClientsMu2.Unlock()
+	//redisErr := util.Del(claims.UserID)
+	//if redisErr != nil {
+	//	logs.Error("Redis error:",err)
+	//	return
+	//}
+}
+
+// handleMessages 处理消息
+func handleMessages() {
+	for msg := range messageChannel {
+		if msg.ReceiverID == "all" {
+			broadcastMessage(msg)
+		} else {
+			sendToUser(msg)
+		}
+	}
+}
+
+// broadcastMessage 广播消息
+func broadcastMessage(msg Message) {
+	broadcastMessageMu.Lock()
+	defer broadcastMessageMu.Unlock()
+	for client := range socketClients {
+		err := client.WriteMessage(websocket.TextMessage, []byte(msg.SenderID+":"+msg.Text))
+		if err != nil {
+			logs.Error("Broadcast error:", err)
+			client.Close() //关闭连接，移除池中连接-userid
+			delete(socketClients, client)
+		}
+	}
+}
+
+// sendToUser 单独发送消息
+func sendToUser(msg Message) {
+	sendToUserMu.Lock()
+	defer sendToUserMu.Unlock()
+	for client, clientID := range socketClients {
+		if clientID == msg.ReceiverID {
+			err := client.WriteMessage(websocket.TextMessage, []byte(msg.SenderID+":"+msg.Text))
+			if err != nil {
+				logs.Error("Send error:", err)
+				client.Close() //关闭连接，移除池中连接-userid
+				delete(socketClients, client)
+			}
+			break
+		}
+	}
+}
+
+// GetUsers 获取在线用户列表
+func (c *AdminController) GetUsers() {
+	//长度为0，容量len(socketClients)
+	users := make([]string, 0, len(socketClients))
+	//getUsersMu.Lock()
+	for _, userID := range socketClients {
+		users = append(users, userID)
+	}
+	//getUsersMu.Unlock()
+	c.Data["json"] = users
+	c.ServeJSON()
+}
+func (c *AdminController) Chat() {
+	//获取用户ID，token解析
+	// 从 Cookie 中获取 token
+	token := c.Ctx.GetCookie("token")
+	if token == "" {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
+		logs.Error("Unauthorized")
+		return
+	}
+	claims, err := util.ParseToken(token, "123456")
+	if err != nil {
+		logs.Error("Invalid token:", err, claims)
+		return
+	}
+	c.Data["userID"] = claims.UserID
+	c.TplName = c.controllerName + "/chat.html"
+
+	// 根据前面的信息从数据库中查出 username 的数据
+	//user := models.User{Username: username}
+	//c.o.Read(&user, "username")
+}
+
+/********************************/
+
 // 后台用户登录
 func (c *AdminController) Login() {
 
 	if c.Ctx.Request.Method == "POST" {
-
 		//从前台的请求中获取账号密码信息
 		username := c.GetString("username")
 		password := c.GetString("password")
@@ -42,9 +218,30 @@ func (c *AdminController) Login() {
 		//如果账号密码无误则更新admin信息
 		user.LastIp = c.getClientIp()
 		user.LoginCount = user.LoginCount + 1
+
 		if _, err := c.o.Update(&user); err != nil {
 			c.History("登录异常", "")
 		} else {
+			// 生成token
+			token, err := util.GenerateToken(user.Id, user.Username, "123456")
+			if err != nil {
+				logs.Error("生成 Token 失败", err)
+				c.History("登录异常", "")
+			}
+			// 将 token 存储在 Cookie 中
+			http.SetCookie(c.Ctx.ResponseWriter, &http.Cookie{
+				Name:     "token",
+				Value:    token,
+				Expires:  time.Now().Add(24 * time.Hour),
+				Path:     "/",  // Cookie 的作用路径,这里表示对网站的所有路径都有效
+				HttpOnly: true, //标记为HTTP Only
+				Secure:   true, // 确保通过 HTTPS 传输
+			})
+			c.Ctx.SetCookie("token", token, 3600, "/", "", true, true)
+			//-----
+			// 将 token 存储在 HTTP 头部
+			//c.Ctx.ResponseWriter.Header().Set("X-Auth-Token", token)
+			logs.Info("生成 Token 成功！")
 			c.History("登录成功", "/admin/main.html")
 		}
 		c.SetSession("user", user)
@@ -210,7 +407,7 @@ func (c *AdminController) Index() {
 	c.Data["count"] = count
 	c.Data["list"] = list
 	c.Data["cate_id"] = cateId
-	path := fmt.Sprintf("/admin/index.html?keyword=%s", keyword)
+	path := fmt.Sprintf("/admin/chat.html?keyword=%s", keyword)
 	c.Data["pagebar"] = util.NewPager(page, int(count), pagesize, path, true).ToString()
 	c.TplName = c.controllerName + "/list.tpl"
 }
@@ -224,7 +421,7 @@ func (c *AdminController) Delete() {
 		if _, err := c.o.Delete(&models.Post{Id: id}); err != nil {
 			c.History("未能成功删除", "")
 		} else {
-			c.History("删除成功", "/admin/index.html")
+			c.History("删除成功", "/admin/chat.html")
 		}
 	}
 }
@@ -269,14 +466,14 @@ func (c *AdminController) Save() {
 		if _, err := c.o.Insert(&post); err != nil {
 			c.History("插入数据错误"+err.Error(), "")
 		} else {
-			c.History("插入数据成功", "/admin/index.html")
+			c.History("插入数据成功", "/admin/chat.html")
 		}
 	} else {
 		post.Id = id
 		if _, err := c.o.Update(&post); err != nil {
 			c.History("更新数据出错"+err.Error(), "")
 		} else {
-			c.History("插入数据成功", "/admin/index.html")
+			c.History("插入数据成功", "/admin/chat.html")
 		}
 	}
 }
@@ -341,13 +538,4 @@ func (c *AdminController) Upload() {
 	}
 	c.Data["json"] = response
 	c.ServeJSON()
-}
-
-func (c *AdminController) RedisTest() {
-	val, err := util.TTL("mykey")
-	if err != nil {
-		logs.Error("Error getting cache:", err)
-		return
-	}
-	logs.Info(val)
 }

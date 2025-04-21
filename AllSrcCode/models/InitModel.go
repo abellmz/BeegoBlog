@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
 	"strings"
 	"time"
 )
@@ -44,8 +45,10 @@ func InitAdmin() {
 	// 检查管理员用户是否已存在
 	exists := o.QueryTable(new(User)).Filter("Username", "admin").Exist()
 	if !exists {
+		newUUID := uuid.New()
 		// 如果不存在，则插入管理员用户
 		user := User{
+			Id:       newUUID.String(),
 			Username: "admin",
 			Password: util.Md5("123456"),
 			LastTime: time.Now(),
