@@ -49,7 +49,7 @@ func InitAdmin() {
 		// 如果不存在，则插入管理员用户
 		user := User{
 			Id:       newUUID.String(),
-			Username: "admin1",
+			Username: "admin",
 			Password: util.Md5("123456"),
 			LastTime: time.Now(),
 			Created:  time.Now(),
