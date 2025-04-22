@@ -237,7 +237,7 @@ func (c *AdminController) Login() {
 				HttpOnly: true, //标记为HTTP Only
 				Secure:   true, // 确保通过 HTTPS 传输
 			})
-			//c.Ctx.SetCookie("token", token, 3600, "/", "", true, true)
+			c.Ctx.SetCookie("token", token, 3600, "/", "", true, true)
 			//-----
 			// 将 token 存储在 HTTP 头部
 			//c.Ctx.ResponseWriter.Header().Set("X-Auth-Token", token)
