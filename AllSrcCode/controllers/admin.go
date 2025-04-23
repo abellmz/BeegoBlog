@@ -241,7 +241,7 @@ func (c *AdminController) Login() {
 			//-----
 			// 将 token 存储在 HTTP 头部
 			//c.Ctx.ResponseWriter.Header().Set("X-Auth-Token", token)
-			logs.Info("生成 Token 成功！token：" + token)
+			logs.Info("生成 Token 成功!")
 			c.History("登录成功", "/admin/main.html")
 		}
 		c.SetSession("user", user)
