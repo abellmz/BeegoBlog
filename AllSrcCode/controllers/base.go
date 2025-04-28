@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"BeegoBlog/AllSrcCode/models"
 	_ "BeegoBlog/AllSrcCode/models"
 	//"beego-blog-blog-dev2/models"
 	"github.com/astaxie/beego"
@@ -27,12 +26,13 @@ func (p *baseController) Prepare() {
 
 	//新建一个ORM，之前已经在initMode中注册了mysql
 	p.o = orm.NewOrm()
+	lowerControllerName := strings.ToLower(p.controllerName)
 	//若是api关闭自动渲染
-	if strings.ToLower(p.controllerName) == "api" {
+	if lowerControllerName == "api" {
 		p.EnableRender = false
 	}
 	//跳转条件：是admin，当前动作不是login，且用户未登录（在session中没有记录）
-	if strings.ToLower(p.controllerName) == "admin" && strings.ToLower(p.actionName) != "login" {
+	if lowerControllerName == "admin" && strings.ToLower(p.actionName) != "login" {
 		if p.GetSession("user") == nil {
 			p.History("您还未登录，请登录！", "/admin/login")
 			//p.Ctx.WriteString(p.controllerName +"==="+ p.actionName)
@@ -40,18 +40,17 @@ func (p *baseController) Prepare() {
 	}
 
 	//初始化前台页面相关元素
-	if strings.ToLower(p.controllerName) == "blog" {
-		p.Data["actionName"] = strings.ToLower(actionName)
-		var res []*models.Config
-		p.o.QueryTable(new(models.Config).TableName()).All(&res)
-
-		configs := make(map[string]string)
-		for _, v := range res {
-			configs[v.Name] = v.Value
-		}
-		p.Data["config"] = configs
-	}
-
+	//if lowerControllerName == "blog" {
+	//	p.Data["actionName"] = strings.ToLower(actionName)
+	//	var res []*models.Config
+	//	p.o.QueryTable(new(models.Config).TableName()).All(&res)
+	//
+	//	configs := make(map[string]string)
+	//	for _, v := range res {
+	//		configs[v.Name] = v.Value
+	//	}
+	//	p.Data["config"] = configs
+	//}
 }
 
 func (p *baseController) History(msg string, url string) {
