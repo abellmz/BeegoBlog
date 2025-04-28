@@ -32,12 +32,12 @@ func (p *baseController) Prepare() {
 		p.EnableRender = false
 	}
 	//跳转条件：是admin，当前动作不是login，且用户未登录（在session中没有记录）
-	if lowerControllerName == "admin" && strings.ToLower(p.actionName) != "login" {
-		if p.GetSession("user") == nil {
-			p.History("您还未登录，请登录！", "/admin/login")
-			//p.Ctx.WriteString(p.controllerName +"==="+ p.actionName)
-		}
-	}
+	//if lowerControllerName == "admin" && strings.ToLower(p.actionName) != "login" {
+	//	if p.GetSession("user") == nil {
+	//		p.History("您还未登录，请登录！", "/admin/login")
+	//		//p.Ctx.WriteString(p.controllerName +"==="+ p.actionName)
+	//	}
+	//}
 
 	//初始化前台页面相关元素
 	//if lowerControllerName == "blog" {
