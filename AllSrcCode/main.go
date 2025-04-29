@@ -24,15 +24,10 @@ func main() {
 	//}
 	//fmt.Println("RunMode:", beego.AppConfig.String("runmode"))
 	//fmt.Println("HttpPort:", beego.AppConfig.String("httpport"))
-	//fmt.Println("MysqlHost:", beego.AppConfig.String("mysqlHost"))
-	//fmt.Println("MysqlPort:", beego.AppConfig.String("mysqlPort"))
-	//fmt.Println("MysqlUser:", beego.AppConfig.String("mysqlUser"))
-	//fmt.Println("MysqlPassword:", beego.AppConfig.String("mysqlPassword"))
-	//fmt.Println("MysqlDb:", beego.AppConfig.String("mysqlDb"))
-	//beego.BConfig.RunMode = "dev"
 
-	util.InitLogs() //初始化日志
-	models.Init()   // 初始化模型和数据库连接
+	util.UpdateJWTSecretKey() //更新JWT秘钥
+	util.InitLogs()           //初始化日志
+	models.Init()             // 初始化模型和数据库连接
 	//aliasName数据库别名,isDrop是否在创建表之前先删除现有的表,isForce是否强制创建表
 	orm.RunSyncdb("default", false, true) // 自动建表 有这个debug直接报错并停止运行
 	models.InitAdmin()                    //初始化管理员数据

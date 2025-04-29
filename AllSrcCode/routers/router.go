@@ -2,7 +2,9 @@ package routers
 
 import (
 	"BeegoBlog/AllSrcCode/controllers"
+	"BeegoBlog/AllSrcCode/util"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
 )
 
 func init() {
@@ -15,5 +17,17 @@ func init() {
 	beego.AutoRouter(&controllers.AdminController{})
 	beego.AutoRouter(&controllers.ApiController{})
 	beego.ErrorController(&controllers.ErrorController{})
+	/**
+	插入一个过滤器（middleware）
+	"/* :" 匹配/*的路由，
+	beego.BeforeRouter 中间件在路由处理前执行，
+	beego.BeforeExec 在路由正确匹配后执行
+	JWTAuthMiddleware 中间件函数本身，用于实现自定义逻辑
+	*/
+	beego.InsertFilter("/admin/*", beego.BeforeExec, JWTAuthMiddleware)
 
+}
+
+func JWTAuthMiddleware(context *context.Context) {
+	util.JWTAuthMiddleware(context)
 }

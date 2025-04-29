@@ -1,9 +1,19 @@
 package util
 
 import (
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego/logs"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
+	"gopkg.in/ini.v1"
+	"net/http"
 	"time"
 )
+
+type JWT struct {
+	beego.Controller
+}
 
 // 定义 JWT 参数，cuetomer claims
 type CustomClaims struct {
@@ -40,4 +50,54 @@ func ParseToken(tokenString string, secretKey string) (*CustomClaims, error) {
 		return claims, nil //若负载部分Claims类型正确，且签名正确，直接返回负载信息
 	}
 	return nil, err
+}
+
+// 配置文件信息
+func LoadConfig() (config *ini.File) {
+	//加载配置文件
+	configInfo, err := ini.Load("conf/app.conf")
+	if err != nil {
+		logs.Error("加载配置文件失败:", err)
+		return
+	}
+	return configInfo
+}
+func GetJWTSecretKey() (SecretKey string) {
+	configInfo := LoadConfig()
+	return configInfo.Section("").Key("jwtSecretKey").String()
+}
+
+// 更新jwt秘钥
+func UpdateJWTSecretKey() {
+	//加载配置文件
+	configInfo := LoadConfig()
+	// 生成新的密钥
+	newSecretKey := uuid.New().String()
+	// 更新配置文件中的密钥
+	configInfo.Section("").Key("jwtSecretKey").SetValue(newSecretKey)
+	// 保存配置文件
+	saveErr := configInfo.SaveTo("conf/app.conf")
+	// 保存配置文件
+	if saveErr != nil {
+		logs.Error("保存配置文件失败:", saveErr)
+		return
+	}
+	logs.Info("JWT密钥已更新:")
+}
+
+func JWTAuthMiddleware(ctx *context.Context) {
+	token := ctx.GetCookie("token")
+	if token == "" {
+		ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
+		logs.Error("Unauthorized:")
+		ctx.Redirect(302, "/login")
+		return
+	}
+	jwtSecretKey := GetJWTSecretKey()
+	claims, err := ParseToken(token, jwtSecretKey)
+	if err != nil {
+		logs.Error("Invalid token:", err, claims)
+		ctx.Redirect(302, "/login")
+		return
+	}
 }

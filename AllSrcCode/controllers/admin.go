@@ -73,7 +73,8 @@ func (c *AdminController) WebSocketHandler() {
 		logs.Error("Unauthorized:")
 		return
 	}
-	claims, err := util.ParseToken(token, "123456")
+	jwtSecretKey := util.GetJWTSecretKey()
+	claims, err := util.ParseToken(token, jwtSecretKey)
 	if err != nil {
 		logs.Error("Invalid token:", err, claims)
 		return
@@ -169,6 +170,7 @@ func (c *AdminController) GetUsers() {
 	c.Data["json"] = users
 	c.ServeJSON()
 }
+
 func (c *AdminController) Chat() {
 	//获取用户ID，token解析
 	// 从 Cookie 中获取 token
@@ -178,7 +180,8 @@ func (c *AdminController) Chat() {
 		logs.Error("Unauthorized")
 		return
 	}
-	claims, err := util.ParseToken(token, "123456")
+	jwtSecretKey := util.GetJWTSecretKey()
+	claims, err := util.ParseToken(token, jwtSecretKey)
 	if err != nil {
 		logs.Error("Invalid token:", err, claims)
 		return
@@ -196,7 +199,17 @@ func (c *AdminController) Chat() {
 // 退出登录
 func (c *AdminController) Logout() {
 	c.DestroySession()
-	c.History("退出登录", "/admin/login.html")
+	//token销毁
+	http.SetCookie(c.Ctx.ResponseWriter, &http.Cookie{
+		Name:     "token",
+		Value:    "",
+		Expires:  time.Now().Add(-24 * time.Hour),
+		Path:     "/",  // Cookie 的作用路径,这里表示对网站的所有路径都有效
+		HttpOnly: true, //标记为HTTP Only
+		Secure:   true, // 确保通过 HTTPS 传输
+	})
+	c.Ctx.SetCookie("token", "", -1, "/", "", true, true)
+	c.History("退出登录", "/login.html")
 }
 
 // 配置后台

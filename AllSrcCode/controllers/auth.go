@@ -47,9 +47,10 @@ func (c *AuthController) Login() {
 		if _, err := c.o.Update(&user); err != nil {
 			c.History("登录异常", "")
 		} else {
+			jwtSecretKey := util.GetJWTSecretKey()
 			// 生成token
-			token, err := util.GenerateToken(user.Id, user.Username, "123456")
-			if err != nil {
+			token, tokenErr := util.GenerateToken(user.Id, user.Username, jwtSecretKey)
+			if tokenErr != nil {
 				logs.Error("生成 Token 失败", err)
 				c.History("登录异常", "")
 			}
