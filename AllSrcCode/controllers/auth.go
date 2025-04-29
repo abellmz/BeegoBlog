@@ -6,7 +6,9 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	"html/template"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -22,21 +24,33 @@ func (c *AuthController) Login() {
 		//从前台的请求中获取账号密码信息
 		username := c.GetString("username")
 		password := c.GetString("password")
+		// 清理输入 防XSS
+		cleanedUsername := cleanInput(username)
+		cleanedPassword := cleanInput(password)
+		//格式检查
+		isValid := isValidInput(cleanedUsername, cleanedPassword)
+		if !isValid {
+			logs.Error("账号或密码格式错误！")
+			c.History("账号或密码格式错误", "")
+		}
+
 		// 获取 ORM 实例
 		c.o = orm.NewOrm()
 		// 根据前面的信息从数据库中查出 username 的数据
-		user := models.User{Username: username}
+		user := models.User{Username: cleanedUsername}
 		ormerr := c.o.Read(&user, "username")
 		if ormerr != nil {
 			logs.Error("orm错误：", ormerr)
+			return
 		}
 
 		if user.Password == "" {
+			logs.Error("账号不存在：", "")
 			c.History("账号不存在", "")
 		}
 
 		//判断登录信息是否正确
-		if util.Md5(password) != strings.Trim(user.Password, " ") {
+		if util.Md5(cleanedPassword) != strings.Trim(user.Password, " ") {
 			c.History("密码错误", "")
 		}
 
@@ -74,6 +88,26 @@ func (c *AuthController) Login() {
 	}
 	//注册登录模板
 	c.TplName = "admin/login.html"
+}
+
+// 清理输入，移除潜在的恶意代码
+func cleanInput(input string) string {
+	// 移除HTML标签
+	noHTML := regexp.MustCompile(`</?[^>]+>`).ReplaceAllString(input, "")
+	// 转义特殊字符
+	escaped := template.HTMLEscapeString(noHTML)
+	// 移除多余的空白字符
+	cleaned := strings.TrimSpace(escaped)
+	return cleaned
+}
+
+// 正则验证输入是否符合格式
+func isValidInput(username, password string) bool {
+	//5-20个字符，只能包含字母、数字和下划线
+	usernamePattern := regexp.MustCompile(`^[a-zA-Z0-9_]{5,20}$`)
+	passwordPattern := regexp.MustCompile(`^[a-zA-Z0-9_]{6,20}$`)
+
+	return usernamePattern.MatchString(username) && passwordPattern.MatchString(password)
 }
 
 func (p *AuthController) History(msg string, url string) {
