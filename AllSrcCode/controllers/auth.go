@@ -21,6 +21,7 @@ type AuthController struct {
 func (c *AuthController) Login() {
 
 	if c.Ctx.Request.Method == "POST" {
+		// Beego 会自动验证 CSRF 令牌
 		//从前台的请求中获取账号密码信息
 		username := c.GetString("username")
 		password := c.GetString("password")
@@ -86,6 +87,10 @@ func (c *AuthController) Login() {
 		}
 		c.SetSession("user", user)
 	}
+	// 获取 CSRF 令牌
+	csrfToken := c.XSRFToken()
+	// 将 CSRF 令牌传递给模板
+	c.Data["xsrfdata"] = csrfToken
 	//注册登录模板
 	c.TplName = "admin/login.html"
 }
