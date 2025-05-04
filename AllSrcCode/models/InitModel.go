@@ -1,12 +1,12 @@
 package models
 
 import (
-	"BeegoBlog/AllSrcCode/util"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"strings"
 	"time"
 )
@@ -46,17 +46,25 @@ func InitAdmin() {
 	exists := o.QueryTable(new(User)).Filter("Username", "admin").Exist()
 	if !exists {
 		newUUID := uuid.New()
+
+		// 对密码进行加密
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
+		if err != nil {
+			logs.Error("encryption error:", err)
+		}
+
 		// 如果不存在，则插入管理员用户
 		user := User{
 			Id:       newUUID.String(),
 			Username: "admin",
-			Password: util.Md5("123456"),
+			//Password: util.Md5("123456"),
+			Password: string(hashedPassword),
 			LastTime: time.Now(),
 			Created:  time.Now(),
 			Updated:  time.Now(),
 		}
-		_, err := o.Insert(&user)
-		if err != nil {
+		_, InsertErr := o.Insert(&user)
+		if InsertErr != nil {
 			// 处理错误
 			logs.Error("Failed to insert admin user:", err)
 		} else {

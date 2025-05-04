@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
 	"regexp"
@@ -51,7 +52,11 @@ func (c *AuthController) Login() {
 		}
 
 		//判断登录信息是否正确
-		if util.Md5(cleanedPassword) != strings.Trim(user.Password, " ") {
+		//if util.Md5(cleanedPassword) != strings.Trim(user.Password, " ") {
+		//	c.History("密码错误", "")
+		//}
+		// 验证密码
+		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(cleanedPassword)); err != nil {
 			c.History("密码错误", "")
 		}
 
