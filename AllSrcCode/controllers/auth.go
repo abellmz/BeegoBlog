@@ -30,8 +30,10 @@ func (c *AuthController) Login() {
 		cleanedUsername := cleanInput(username)
 		cleanedPassword := cleanInput(password)
 		//格式检查
-		isValid := isValidInput(cleanedUsername, cleanedPassword)
-		if !isValid {
+		//5-20个字符
+		validUsernameFormat := regexp.MustCompile(`^[a-zA-Z0-9_]{5,20}$`).MatchString(cleanedUsername)
+		isPasswordPassed := validPasswordFormat(cleanedPassword)
+		if !validUsernameFormat || !isPasswordPassed {
 			logs.Error("账号或密码格式错误！")
 			c.History("账号或密码格式错误", "")
 		}
@@ -112,25 +114,46 @@ func cleanInput(input string) string {
 }
 
 // 正则验证输入是否符合格式
-func isValidInput(username, password string) bool {
-	//5-20个字符，只能包含字母、数字和下划线
-	usernamePattern := regexp.MustCompile(`^[a-zA-Z0-9_]{5,20}$`)
-	passwordPattern := regexp.MustCompile(`^[a-zA-Z0-9_]{6,20}$`)
-
-	return usernamePattern.MatchString(username) && passwordPattern.MatchString(password)
+func validPasswordFormat(password string) bool {
+	// 检查密码是否至少包含一个大写字母
+	hasCapitalLetter := regexp.MustCompile(`[A-Z]`).MatchString(password)
+	if !hasCapitalLetter {
+		return false
+	}
+	// 检查密码是否至少包含一个小写字母
+	hasSmallLetter := regexp.MustCompile(`[a-z]`).MatchString(password)
+	if !hasSmallLetter {
+		return false
+	}
+	// 检查密码是否至少包含一个数字
+	hasDigit := regexp.MustCompile(`\d`).MatchString(password)
+	if !hasDigit {
+		return false
+	}
+	// 检查密码是否至少包含一个特殊字符
+	hasSpecialChar := regexp.MustCompile(`[@#$%^&+=!]`).MatchString(password)
+	if !hasSpecialChar {
+		return false
+	}
+	// 检查密码长度是否在12到20位之间
+	hasValidLength := regexp.MustCompile(`^.{12,20}$`).MatchString(password)
+	if !hasValidLength {
+		return false
+	}
+	return true
 }
 
-func (p *AuthController) History(msg string, url string) {
+func (c *AuthController) History(msg string, url string) {
 	if url == "" {
-		p.Ctx.WriteString("<script>alert('" + msg + "');window.history.go(-1);</script>")
-		p.StopRun()
+		c.Ctx.WriteString("<script>alert('" + msg + "');window.history.go(-1);</script>")
+		c.StopRun()
 	} else {
-		p.Redirect(url, 302)
+		c.Redirect(url, 302)
 	}
 }
 
 // 获取用户IP地址
-func (p *AuthController) getClientIp() string {
-	s := strings.Split(p.Ctx.Request.RemoteAddr, ":")
+func (c *AuthController) getClientIp() string {
+	s := strings.Split(c.Ctx.Request.RemoteAddr, ":")
 	return s[0]
 }

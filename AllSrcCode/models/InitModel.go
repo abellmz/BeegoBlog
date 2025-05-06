@@ -46,9 +46,8 @@ func InitAdmin() {
 	exists := o.QueryTable(new(User)).Filter("Username", "admin").Exist()
 	if !exists {
 		newUUID := uuid.New()
-
 		// 对密码进行加密
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("Lmuyangren@123"), bcrypt.DefaultCost)
 		if err != nil {
 			logs.Error("encryption error:", err)
 		}
@@ -66,7 +65,7 @@ func InitAdmin() {
 		_, InsertErr := o.Insert(&user)
 		if InsertErr != nil {
 			// 处理错误
-			logs.Error("Failed to insert admin user:", err)
+			logs.Error("Failed to insert admin user:", InsertErr)
 		} else {
 			logs.Info("Admin user initialized successfully")
 		}
