@@ -73,7 +73,7 @@ func (c *AuthController) Login() {
 			// 生成token
 			token, tokenErr := util.GenerateToken(user.Id, user.Username, jwtSecretKey)
 			if tokenErr != nil {
-				logs.Error("生成 Token 失败", err)
+				logs.Error(user.Id+"生成 Token 失败", err)
 				c.History("登录异常", "")
 			}
 			// 将 token 存储在 Cookie 中
@@ -89,7 +89,7 @@ func (c *AuthController) Login() {
 			//-----
 			// 将 token 存储在 HTTP 头部
 			//c.Ctx.ResponseWriter.Header().Set("X-Auth-Token", token)
-			logs.Info("生成 Token 成功!")
+			logs.Info(user.Id + "生成 Token 成功!")
 			c.History("登录成功", "/admin/main.html")
 		}
 		c.SetSession("user", user)
