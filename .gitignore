@@ -16,3 +16,7 @@
 AllSrcCode/logs/*.log
 AllSrcCode/conf/app.conf
 AllSrcCode/bin/*
+AllSrcCode/go.mod
+AllSrcCode/go.sum
+AllSrcCode/static/uploads/*
+AllSrcCode/AllSrcCode
