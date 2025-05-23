@@ -45,12 +45,12 @@ func (c *AuthController) Login() {
 		ormerr := c.o.Read(&user, "username")
 		if ormerr != nil {
 			logs.Error("orm错误：", ormerr)
-			return
+			c.History("账号不存在！", "")
 		}
 
 		if user.Password == "" {
-			logs.Error("账号不存在：", "")
-			c.History("账号不存在", "")
+			logs.Error("密码不能为空", "")
+			c.History("密码不能为空", "")
 		}
 
 		//判断登录信息是否正确
@@ -92,7 +92,7 @@ func (c *AuthController) Login() {
 			logs.Info(user.Id + "生成 Token 成功!")
 			c.History("登录成功", "/admin/main.html")
 		}
-		c.SetSession("user", user)
+		//c.SetSession("user", user)
 	}
 	// 获取 CSRF 令牌
 	csrfToken := c.XSRFToken()

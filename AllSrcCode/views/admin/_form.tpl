@@ -76,8 +76,9 @@
     <div class="layui-form-item">
         <label class="layui-form-label">图片</label>
         <div class="layui-input-block">
+            <input type="hidden" name="_xsrf" value="{{ .xsrfdata }}">
             <input name="Image" id="Image" value="{{.post.Image}}" placeholder="请输入内容" style="width: 300px; float: left"  class="layui-input">
-            <input type="file" name="uploadname" style="float: left" lay-ext="jpg|png|gif" class="layui-upload-file">
+            <input type="file" name="uploadname" style="float: left" lay-ext="jpg|png|gif|jpeg" class="layui-upload-file">
         </div>
     </div>
 

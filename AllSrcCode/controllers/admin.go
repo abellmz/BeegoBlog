@@ -198,7 +198,7 @@ func (c *AdminController) Chat() {
 
 // 退出登录
 func (c *AdminController) Logout() {
-	c.DestroySession()
+	//c.DestroySession()
 	//token销毁
 	http.SetCookie(c.Ctx.ResponseWriter, &http.Cookie{
 		Name:     "token",
@@ -390,6 +390,10 @@ func (c *AdminController) Article() {
 		c.o.Read(&post)
 		c.Data["post"] = post
 	}
+	// 获取 CSRF 令牌
+	csrfToken := c.XSRFToken()
+	// 将 CSRF 令牌传递给模板
+	c.Data["xsrfdata"] = csrfToken
 	c.Data["categorys"] = categorys
 	c.TplName = c.controllerName + "/_form.tpl"
 }
