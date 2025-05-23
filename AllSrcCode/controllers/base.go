@@ -18,6 +18,7 @@ type baseController struct {
 // 后台登录
 // 不允许在未登录的情况下访问controller，所以需要判断是否已经登录
 func (p *baseController) Prepare() {
+	p.EnableXSRF = false
 	controllerName, actionName := p.GetControllerAndAction()
 	//转换小写提取0-5 比如字母admin
 	p.controllerName = strings.ToLower(controllerName[0 : len(controllerName)-10])
