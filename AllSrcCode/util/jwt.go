@@ -82,7 +82,7 @@ func UpdateJWTSecretKey() {
 		logs.Error("保存配置文件失败:", saveErr)
 		return
 	}
-	logs.Info("JWT密钥已更新:")
+	logs.Info("JWT密钥已更新！")
 }
 
 func JWTAuthMiddleware(ctx *context.Context) {
@@ -97,6 +97,10 @@ func JWTAuthMiddleware(ctx *context.Context) {
 	claims, err := ParseToken(token, jwtSecretKey)
 	if err != nil {
 		logs.Error("Invalid token:", err, claims)
+		//fullURL := ctx.Request.URL.String()
+		//if fullURL === "/ws" || fullURL === "/user" {
+		//
+		//}
 		ctx.Redirect(302, "/login")
 		return
 	}

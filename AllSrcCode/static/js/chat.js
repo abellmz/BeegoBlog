@@ -32,10 +32,16 @@ function connectWebSocket() {
         appendMessage(message);
     };
 
-    ws.onclose = function() {
+    ws.onclose = function(event) {
         console.log('Disconnected from WebSocket server');
         clearInterval(userListUpdateInterval); // 清除定时器
-        setTimeout(connectWebSocket, 3000);
+        if (event.code === 1006) {
+            // 如果是网络问题，尝试重新连接
+            setTimeout(connectWebSocket, 3000);
+        } else {
+            // 如果不是网络问题，跳转到登录页面
+            window.location.href = "/login";
+        }
     };
 
     ws.onerror = function(error) {

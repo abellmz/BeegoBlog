@@ -10,6 +10,7 @@ import (
 	"html/template"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -70,10 +71,11 @@ func (c *AuthController) Login() {
 			c.History("登录异常", "")
 		} else {
 			jwtSecretKey := util.GetJWTSecretKey()
+			userID := strconv.FormatInt(user.Id, 10)
 			// 生成token
-			token, tokenErr := util.GenerateToken(user.Id, user.Username, jwtSecretKey)
+			token, tokenErr := util.GenerateToken(userID, user.Username, jwtSecretKey)
 			if tokenErr != nil {
-				logs.Error(user.Id+"生成 Token 失败", err)
+				logs.Error(userID+"生成 Token 失败", err)
 				c.History("登录异常", "")
 			}
 			// 将 token 存储在 Cookie 中
@@ -85,11 +87,11 @@ func (c *AuthController) Login() {
 				HttpOnly: true, //标记为HTTP Only
 				Secure:   true, // 确保通过 HTTPS 传输
 			})
-			c.Ctx.SetCookie("token", token, 3600, "/", "", true, true)
+			//c.Ctx.SetCookie("token", token, 3600, "/", "", true, true)
 			//-----
 			// 将 token 存储在 HTTP 头部
 			//c.Ctx.ResponseWriter.Header().Set("X-Auth-Token", token)
-			logs.Info(user.Id + "生成 Token 成功!")
+			logs.Info(userID + "生成 Token 成功!")
 			c.History("登录成功", "/admin/main.html")
 		}
 		//c.SetSession("user", user)

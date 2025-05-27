@@ -25,6 +25,8 @@ func init() {
 	JWTAuthMiddleware 中间件函数本身，用于实现自定义逻辑
 	*/
 	beego.InsertFilter("/admin/*", beego.BeforeExec, JWTAuthMiddleware)
+	beego.InsertFilter("/ws", beego.BeforeExec, JWTAuthMiddleware)
+	beego.InsertFilter("/users", beego.BeforeExec, JWTAuthMiddleware)
 
 }
 

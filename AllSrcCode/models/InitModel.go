@@ -1,11 +1,11 @@
 package models
 
 import (
+	"BeegoBlog/AllSrcCode/util"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
 	"time"
@@ -45,7 +45,7 @@ func InitAdmin() {
 	// 检查管理员用户是否已存在
 	exists := o.QueryTable(new(User)).Filter("Username", "admin").Exist()
 	if !exists {
-		newUUID := uuid.New()
+		ID := util.GenerateSnowflakeId()
 		// 对密码进行加密
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("Lmuyangren@123"), bcrypt.DefaultCost)
 		if err != nil {
@@ -54,7 +54,7 @@ func InitAdmin() {
 
 		// 如果不存在，则插入管理员用户
 		user := User{
-			Id:       newUUID.String(),
+			Id:       ID,
 			Username: "admin",
 			//Password: util.Md5("123456"),
 			Password: string(hashedPassword),
