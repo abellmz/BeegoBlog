@@ -20,11 +20,17 @@
 > > controllers 控制器目录
 > >
 > > logs 日志目录
+> >
 > > models 数据表的目录
+> >
 > > routers 路由目录
+> >
 > > static 静态文件目录
+> >
 > > tests 测试目录
+> >
 > > util 辅助文件目录
+> >
 > > views 前端目录
 
 
