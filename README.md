@@ -9,17 +9,24 @@
 新增监控日志功能，增强系统可维护性；新增JWT，提高系统安全性；添加相关安全措施，进一步保障用户数据安全。（其功能的添加为实验性质，不代表一定适配系统）
 
 #### 软件架构
+
+
 > AllSrcCode 代码所在
->> conf 配置项目录
->>> app.conf 配置文件
->> controllers 控制器目录
->> logs 日志目录
->> models 数据表的目录
->> routers 路由目录
->> static 静态文件目录
->> tests 测试目录
->> util 辅助文件目录
->>views 前端目录
+>
+> > conf 配置项目录
+> >
+> > > app.conf 配置文件
+> >
+> > controllers 控制器目录
+> > logs 日志目录
+> > models 数据表的目录
+> > routers 路由目录
+> > static 静态文件目录
+> > tests 测试目录
+> > util 辅助文件目录
+> > views 前端目录
+
+
 
 #### 安装教程
 
