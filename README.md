@@ -13,13 +13,23 @@
 >> conf 配置项目录
 >>> app.conf 配置文件
 >> controllers 控制器目录
-
+>> logs 日志目录
+>> models 数据表的目录
+>> routers 路由目录
+>> static 静态文件目录
+>> tests 测试目录
+>> util 辅助文件目录
+>>views 前端目录
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+```
+> git clone XXX
+>cd BeegoBlog
+>go mod init
+>go mod tidy
+>cd AllSrcCode
+>go run main.go
 
 #### 使用说明
 
