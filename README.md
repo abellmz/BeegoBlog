@@ -1,12 +1,21 @@
 # BeegoBlog
 
 #### 介绍
-来源是github用户 lightTrace 的开源博客项目，选取其中有关于后台管理的部分。
-项目本身是用于新手练习使用，基于beego框架开发的一个Blog后台系统，包含了基本的博客增删改查以及图片上传。
+来源于Github用户JiangRRRen 改编的lightTrace 的开源博客项目，选取其中有关于后台管理的部分。
+项目本身适合于新手练习使用，是基于Beego框架开发的一个Blog后台系统，包含了基本的博客增删改查、图片上传等。
 
-原功能：包括用户登录登出、博客栏目和文章的增删改查、文件上传。
+原项目功能：包括用户登录登出、博客栏目和文章的增删改查、文件上传等。
+新增功能：
 
-新增监控日志功能，增强系统可维护性；新增JWT，提高系统安全性；新增聊天室功能，提升用户互动体验；添加相关安全措施，进一步保障用户数据安全。（其功能的添加为实验性质，不代表一定适配系统）
+1.新增监控日志功能，增强系统可维护性；
+
+2.新增JWT，提高系统安全性；
+
+3.新增聊天室功能，提升用户互动体验；
+
+4.添加相关安全措施，进一步保障用户数据安全。
+
+（功能的添加为实验性质，不代表一定适配系统）
 
 #### 软件架构
 
@@ -36,7 +45,7 @@
 
 
 #### 安装教程
-
+1.项目安装
 ```
 > git clone XXX
 >cd BeegoBlog
@@ -45,12 +54,47 @@
 >cd AllSrcCode
 >go run main.go
 ```
+2.项目配置：
 
-#### 使用说明
+添加AllSrcCode/conf/app.conf配置文件，内容为：
+```bigquery
+appname       = Blog
+httpport      = 8080
+runmode       = dev
+# sessionon     = true
+# sessionname   = beegosessionID
+# [mysql]
+mysqlHost     = localhost
+mysqlPort     = 3306
+mysqlUser     = root
+mysqlPassword = 1111
+mysqlDb       = myBlogWeb
+mysqlPrefix   = tb_
+# [redis]
+redisAddress  = localhost:6379
+redisPassword = 1111
+redisDb       = 0
+# 指定缓存的前缀
+redisKey      = beego_cache
+# [log]
+logsfilename  = logs/app.log
+level         = 3
+jwtSecretKey  = c5006b96-71c1-4f78-9701-b3ace88498ac
+# CSRF
+enablexsrf    = false
+xsrfkey       = 61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o
+xsrfexpire    = 3600
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+```
+若要开启csrf,请将enablexsrf设置为true
+
+日志监控:
+
+若项目运行时未自动建立logs文件夹，可以手动添加AllSrcCode/logs/app.log
+
+文件上传:
+
+若项目运行时无法上传文件，可在自行建立AllSrcCode/static/uploads
 
 #### 参与贡献
 
